@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strength Lab — Asesoramiento de entrenamiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F4EE;
+    --ink:#1A1714;
+    --ink-mid:#3D3A35;
+    --ink-soft:#6B6660;
+
+    --gold:#B8924A;
+    --gold-bg:#F5ECD8;
+    --green:#1E5C3A;
+    --green-bg:#E4F0E9;
+    --red:#8B1F2F;
+    --red-bg:#F5E8EA;
+    --amber:#7A5015;
+    --amber-bg:#FBF0DC;
+
+    --border-soft: rgba(26,23,20,0.10);
+    --border-med: rgba(26,23,20,0.18);
+
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .page{
+    max-width:440px;
+    margin:0 auto;
+    padding:0 22px 70px;
+    position:relative;
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:var(--bg);
+    padding:16px 0 10px;
+    margin:0 -22px;
+  }
+  .nav-inner{
+    padding:0 22px;
+  }
+  .nav-brand{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .nav-brand .word{
+    font-family:var(--serif);
+    font-size:16px;
+    line-height:1.15;
+    letter-spacing:-0.01em;
+  }
+  .nav-brand .word em{ color:var(--gold); font-style:italic; display:block; }
+  .nav-brand .tag{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    padding-top:3px;
+  }
+  .pills{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    padding-bottom:2px;
+  }
+  .pills::-webkit-scrollbar{ display:none; }
+  .pill{
+    flex:0 0 auto;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.04em;
+    color:var(--ink-mid);
+    text-decoration:none;
+    padding:7px 13px;
+    border:1px solid var(--border-soft);
+    border-radius:100px;
+    background:#fff;
+    white-space:nowrap;
+  }
+  .pill.active{
+    border-color:var(--gold);
+    color:var(--ink);
+    background:var(--gold-bg);
+  }
+
+  /* ---------- REVEAL ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .reveal.in{
+    opacity:1;
+    transform:translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity:1; transform:none; transition:none; }
+  }
+
+  /* ---------- EYEBROW ---------- */
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:18px;
+    height:2px;
+    background:var(--gold);
+    flex:0 0 auto;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:30px 0 8px; }
+  .hero h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:38px;
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 16px;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--gold);
+  }
+  .hero p{
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink-mid);
+    margin:0 0 22px;
+    max-width:38ch;
+  }
+
+  /* ---------- DIVIDER ---------- */
+  .divider{
+    height:1px;
+    background:var(--border-soft);
+    margin:30px 0;
+  }
+
+  /* ---------- ROUTE CARD ---------- */
+  .card{
+    background:#fff;
+    border:1px solid var(--border-soft);
+    border-radius:14px;
+    padding:20px;
+  }
+  .route{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .route .pt{ flex:1; }
+  .route .pt .num-label{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .route .pt .num{
+    font-family:var(--serif);
+    font-size:17px;
+    line-height:1.25;
+  }
+  .route .pt.to{ text-align:right; }
+  .route .arrow{
+    flex:0 0 auto;
+    width:34px;
+    height:1px;
+    background:var(--border-med);
+    position:relative;
+  }
+  .route .arrow::after{
+    content:"";
+    position:absolute;
+    right:-1px; top:-3px;
+    width:7px; height:7px;
+    border-top:1px solid var(--ink-mid);
+    border-right:1px solid var(--ink-mid);
+    transform:rotate(45deg);
+  }
+
+  /* ---------- SECTION TITLES ---------- */
+  .section{ margin-top:0; }
+  .section h2{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:24px;
+    margin:0 0 16px;
+    letter-spacing:-0.01em;
+  }
+
+  /* ---------- INCLUDES GRID ---------- */
+  .includes-grid{
+    display:grid;
+    gap:10px;
+  }
+  .inc-card{
+    background:#fff;
+    border:1px solid var(--border-soft);
+    border-radius:12px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .inc-card .mark{
+    flex:0 0 auto;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--green-bg);
+    color:var(--green);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .inc-card .txt{
+    font-size:14px;
+    color:var(--ink);
+  }
+  .inc-card .txt .sub{
+    display:block;
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+    letter-spacing:.02em;
+  }
+
+  /* ---------- INCLUDES ACCORDION ---------- */
+  .inc-item{
+    background:#fff;
+    border:1px solid var(--border-soft);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .inc-trigger{
+    width:100%;
+    background:none;
+    border:none;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    text-align:left;
+    font-family:var(--sans);
+    color:var(--ink);
+  }
+  .inc-trigger .mark{
+    flex:0 0 auto;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:var(--green-bg);
+    color:var(--green);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  .inc-trigger .txt{
+    flex:1;
+    font-size:14px;
+    line-height:1.3;
+  }
+  .inc-trigger .txt .sub{
+    display:block;
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .inc-trigger .chev{
+    flex:0 0 auto;
+    width:18px;
+    height:18px;
+    color:var(--ink-soft);
+    transition:transform .25s ease;
+  }
+  .inc-item.open .inc-trigger .chev{ transform:rotate(135deg); }
+  .inc-item.open .inc-trigger .mark{ background:var(--gold-bg); color:var(--gold); }
+
+  .inc-panel{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .inc-item.open .inc-panel{ max-height:420px; }
+  .inc-panel-inner{
+    padding:0 16px 18px;
+  }
+  .inc-photo{
+    width:100%;
+    aspect-ratio: 16 / 10;
+    border-radius:10px;
+    border:1px dashed var(--border-med);
+    background:
+      repeating-linear-gradient(135deg, var(--gold-bg), var(--gold-bg) 10px, var(--bg) 10px, var(--bg) 20px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  .inc-photo img{
+    width:100%; height:100%;
+    object-fit:contain;
+    background:#fff;
+    display:block;
+  }
+  .inc-photo .placeholder-label{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--gold);
+    background:#fff;
+    padding:5px 10px;
+    border-radius:100px;
+    border:1px solid rgba(184,146,74,0.35);
+  }
+  .inc-desc{
+    font-size:13px;
+    line-height:1.6;
+    color:var(--ink-mid);
+  }
+  .inc-sublist{
+    list-style:none;
+    margin-top:10px;
+    display:grid;
+    gap:6px;
+  }
+  .inc-sublist li{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--ink-mid);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .inc-sublist li::before{
+    content:"·";
+    color:var(--gold);
+    font-weight:700;
+  }
+
+  /* ---------- BADGES ---------- */
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:100px;
+  }
+  .badge.gold{ background:var(--gold-bg); color:var(--gold); border:1px solid rgba(184,146,74,0.35); }
+  .badge.amber{ background:var(--amber-bg); color:var(--amber); border:1px solid rgba(122,80,21,0.3); }
+
+  /* ---------- COACH CARD ---------- */
+  .coach-card{ padding:18px; }
+  .coach-subtitle{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    margin:-10px 0 16px;
+  }
+  .coach-subtitle span{ color:var(--gold); }
+  .coach-photo{
+    width:100%;
+    aspect-ratio: 4 / 5;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:14px;
+    background:var(--gold-bg);
+  }
+  .coach-photo img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .coach-tags{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .coach-bio{
+    font-size:13.5px;
+    line-height:1.65;
+    color:var(--ink-mid);
+  }
+
+  /* ---------- PRICING CARD ---------- */
+  .price-card{
+    background:#fff;
+    border:1px solid var(--border-med);
+    border-radius:14px;
+    padding:24px 20px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .price-card::before{
+    content:"";
+    position:absolute;
+    top:0; left:0; right:0;
+    height:3px;
+    background:linear-gradient(90deg, var(--gold), var(--gold-bg));
+  }
+  .price-card .label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .price-card .value{
+    font-family:var(--serif);
+    font-size:30px;
+    margin-bottom:8px;
+  }
+  .price-card .value em{ font-style:italic; color:var(--gold); }
+  .price-card .note{
+    font-size:13px;
+    color:var(--ink-mid);
+    line-height:1.5;
+    max-width:32ch;
+    margin:0 auto;
+  }
+
+  /* ---------- FAQ-ish details ---------- */
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    padding:13px 0;
+    border-bottom:1px solid var(--border-soft);
+    font-size:13.5px;
+  }
+  .meta-row:last-child{ border-bottom:none; }
+  .meta-row .k{ color:var(--ink-soft); }
+  .meta-row .v{ font-weight:500; }
+
+  /* ---------- CTA ---------- */
+  .cta-block{
+    text-align:center;
+    padding-top:6px;
+  }
+  .cta-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:var(--ink);
+    color:var(--bg);
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:.05em;
+    text-decoration:none;
+    padding:16px 20px;
+    border-radius:12px;
+    margin-bottom:12px;
+  }
+  .cta-btn:active{ opacity:.85; }
+  .cta-note{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--ink-soft);
+    letter-spacing:.03em;
+  }
+
+  /* ---------- TESTIMONIALS ---------- */
+  .testi-grid{
+    display:grid;
+    gap:10px;
+  }
+  .testi-card{ padding:18px; }
+  .testi-quote{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:16px;
+    line-height:1.45;
+    color:var(--ink);
+    margin-bottom:10px;
+  }
+  .testi-author{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+
+  footer{
+    margin-top:40px;
+    padding-top:18px;
+    border-top:1px solid var(--border-soft);
+    display:flex;
+    justify-content:space-between;
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--ink-soft);
+    letter-spacing:.04em;
+  }
+
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="word">Asesorías<em>personalizadas</em></div>
+        <div class="tag">PROGRAMA 1:1</div>
+      </div>
+      <div class="pills">
+        <a href="#inicio" class="pill active" data-pill>Inicio</a>
+        <a href="#incluye" class="pill" data-pill>Qué incluye</a>
+        <a href="#tarifa" class="pill" data-pill>Coach</a>
+        <a href="#detalles" class="pill" data-pill>Detalles</a>
+        <a href="#empezar" class="pill" data-pill>Empezar</a>
+        <a href="#clientes" class="pill" data-pill>Clientes</a>
+      </div>
+    </div>
+  </nav>
+
+  <section id="inicio" class="hero reveal">
+    <div class="eyebrow">Asesoramiento personal de entrenamiento</div>
+    <h1>Strenght<em>Lab</em><br>by Renzo Bello</h1>
+    <p>Un programa hecho a tu medida: entrenamiento, nutrición y seguimiento real, semana a semana.</p>
+
+    <div class="card">
+      <div class="route">
+        <div class="pt from">
+          <div class="num-label">Punto de partida</div>
+          <div class="num">Sin plan,<br>sin guía</div>
+        </div>
+        <div class="arrow"></div>
+        <div class="pt to">
+          <div class="num-label">Destino</div>
+          <div class="num">Progreso<br>medible</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="incluye" class="section reveal">
+    <div class="eyebrow">Qué incluye</div>
+    <h2>Todo lo que necesitás está aquí,<br>12 semanas con estructura.</h2>
+    <div class="includes-grid" id="includes-grid">
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">01</span>
+          <span class="txt">Diagnóstico
+            <span class="sub">Evaluación inicial de tu punto de partida</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <div class="inc-photo"><img src="fotos/diagnostico.jpeg" alt="Diagnóstico de rendimiento fisiológico"></div>
+            <p class="inc-desc">Antes de tocar una sola pesa, sabemos exactamente con qué cuerpo estamos trabajando: composición corporal, gasto calórico real, condición y objetivo. Cero suposiciones, todo medido.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">02</span>
+          <span class="txt">Plan de entrenamiento
+            <span class="sub">Ajustado a tu nivel y objetivo</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <div class="inc-photo"><img src="fotos/entrenamiento.jpeg" alt="Plan de entrenamiento semanal"></div>
+            <p class="inc-desc">Cada serie, cada carga, cada descanso pensado para tu cuerpo y tu objetivo. Nada de rutinas genéricas de internet: progresión real, semana tras semana, hasta que se note.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">03</span>
+          <span class="txt">Plan de nutrición + guía de alimentos
+            <span class="sub">A tu rutina, sin dietas genéricas</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <div class="inc-photo"><img src="fotos/nutricion.jpeg" alt="Evaluación nutricional"></div>
+            <p class="inc-desc">Comé para rendir, no para sufrir. Tu plan de macros calculado a tu medida, más una guía clara de alimentos para que nunca te quedes preguntando qué poner en el plato.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">04</span>
+          <span class="txt">4 webs a tu disposición
+            <span class="sub">Recursos extra incluidos</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <div class="inc-photo"><img src="fotos/webs.jpeg" alt="Herramientas web complementarias"></div>
+            <p class="inc-desc">Cuatro herramientas a tu disposición las 24 horas, sin esperar respuesta mía:</p>
+            <ul class="inc-sublist">
+              <li>Nutrición y macronutrientes</li>
+              <li>Cardio</li>
+              <li>Protocolo de calentamiento</li>
+              <li>Protocolo de abs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">05</span>
+          <span class="txt">Seguimiento semanal
+            <span class="sub">Revisión y ajustes cada semana</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <p class="inc-desc">Nada de mandarte el plan y desaparecer. Cada semana reviso cómo respondiste y ajusto lo que haga falta, para que nunca entrenes a ciegas.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">06</span>
+          <span class="txt">Chat directo por WhatsApp
+            <span class="sub">Consultas cuando las necesites</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <p class="inc-desc">Una duda no espera al próximo check-in. Tenés línea directa conmigo por WhatsApp para resolver lo que surja, cuando surja.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="inc-item" data-item>
+        <button class="inc-trigger" data-trigger>
+          <span class="mark">07</span>
+          <span class="txt">Seguimiento total de 12 semanas
+            <span class="sub">Programa completo, de punta a punta</span>
+          </span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <div class="inc-panel">
+          <div class="inc-panel-inner">
+            <div class="inc-photo"><img src="fotos/seguimiento12.jpeg" alt="Panel de seguimiento de 12 semanas"></div>
+            <p class="inc-desc">12 semanas, un solo panel. Cada cifra que registrás —peso, medidas, macros, adherencia— queda ahí, marcando el camino entre dónde arrancaste y dónde vas a terminar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="tarifa" class="section reveal">
+    <div class="eyebrow">Conoce a tu coach</div>
+    <h2>Renzo</h2>
+    <p class="coach-subtitle">Atleta Competitivo de StreetLifting <span>·</span> Coach Personal</p>
+    <div class="card coach-card">
+      <div class="coach-photo">
+        <img src="fotos/coach.jpeg" alt="Renzo, coach de Strength Lab">
+      </div>
+      <div class="coach-tags">
+        <span class="badge gold">-73 kg</span>
+        <span class="badge amber">Diplomado en Antiaging</span>
+      </div>
+      <p class="coach-bio">Entrenador Aplicado en Rendimiento Deportivo, con diplomados en Fitness, Nutrición Deportiva y Antiaging. Compite y entrena con el mismo criterio: lo que funciona, medido y probado en su propio cuerpo antes que en el tuyo.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="detalles" class="section reveal">
+    <div class="eyebrow">Detalles del programa</div>
+    <h2>Lo esencial.</h2>
+    <div class="card">
+      <div class="meta-row">
+        <span class="k">Modalidad</span>
+        <span class="v">100% online</span>
+      </div>
+      <div class="meta-row">
+        <span class="k">Duración</span>
+        <span class="v">Trimestral, mensual, renovable</span>
+      </div>
+      <div class="meta-row">
+        <span class="k">Cupos</span>
+        <span class="v"><span class="badge amber">Limitados</span></span>
+      </div>
+      <div class="meta-row">
+        <span class="k">Estado</span>
+        <span class="v"><span class="badge gold">Abierto</span></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="empezar" class="section reveal cta-block">
+    <div class="eyebrow" style="justify-content:center;">Empezar</div>
+    <h2 style="margin-bottom:18px;">¿Listo para empezar?</h2>
+    <a class="cta-btn" href="https://instagram.com/TU_USUARIO" target="_blank" rel="noopener">
+      ESCRIBIME POR INSTAGRAM →
+    </a>
+    <div class="cta-note">DM abierto · te respondo con la info y cupos disponibles</div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="clientes" class="section reveal">
+    <div class="eyebrow">Clientes satisfechos</div>
+    <h2>Resultados, no promesas.</h2>
+    <div class="testi-grid">
+      <div class="card testi-card">
+        <p class="testi-quote">"No tenía idea de cómo entrenar, ni cómo hacer los ejercicios. Renzo estuvo respondiéndome cada duda, realmente aprecio mucho el chat 24/7."</p>
+        <div class="testi-author">— Joaquín</div>
+      </div>
+      <div class="card testi-card">
+        <p class="testi-quote">"Lo que más me sirvió fue el chat directo y las páginas web. Cualquier duda con la comida o el entreno, tenía la página de nutrición o a Renzo respondiéndome en WhatsApp."</p>
+        <div class="testi-author">— Martín</div>
+      </div>
+      <div class="card testi-card">
+        <p class="testi-quote">"Hice las 12 semanas completas. Bajé de peso sin perder fuerza, y eso fue justo lo que pedí desde el principio."</p>
+        <div class="testi-author">— Diego</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>STRENGTH LAB</span>
+    <span>ASESORAMIENTO 1:1</span>
+  </footer>
+
+</div>
+
+<script>
+  // Accordion includes
+  document.querySelectorAll('[data-trigger]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('[data-item]');
+      item.classList.toggle('open');
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  reveals.forEach(r => io.observe(r));
+
+  // Active pill on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const pills = document.querySelectorAll('[data-pill]');
+  const navIo = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const id = entry.target.getAttribute('id');
+        pills.forEach(p => {
+          p.classList.toggle('active', p.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.5, rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(s => navIo.observe(s));
+</script>
+
+</body>
+</html>
